@@ -23,8 +23,8 @@ router.post('/pullrequest/', function(req, res){
     var payload = req.body;
     var pr;
     if(payload.action === "opened"){
+        console.log("New pull request for " + payload.repository.full_name);
         pr = github.issue(payload.repository.full_name, payload.pull_request.number);
-
         pr.createComment(
             {
                 body: buildChecklist()
