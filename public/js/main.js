@@ -5,6 +5,7 @@ $('.setup-heading').on('click', function(){
 $('#webhookButton').on('click', function(event){
     event.preventDefault();
     var repos = [];
+    $('.alert').addClass('hide');
     $('input:checked').each(function(){
         repos.push($(this).val());
     });
@@ -16,7 +17,11 @@ $('#webhookButton').on('click', function(event){
         }),
         contentType: 'application/json',
         success: function(){
-
+            $('.alert').removeClass('hide');
+            $('input:checked').prop('checked', false);
+            setTimout(function(){
+                $('.alert').addClass('hide');
+            },5000);
         }
     });
 });

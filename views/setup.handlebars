@@ -1,20 +1,26 @@
-{{#each orgs}}
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title setup-heading">{{@key}}</h3>
-        </div>
-        <div class="panel-body">
-            <ul class="setup-list">
-                {{#each this}}
-                    <li>
-                        <label><input type="checkbox" value="{{this}}" /> {{this}}</label>
-                    </li>
-                {{/each}}
-            </ul>
-        </div>
+<div class="top-buttons text-center">
+    <div class="alert alert-success hide col-xs-offset-3 col-xs-6">
+    Successfully added webhooks
     </div>
-{{/each}}
-
-<div class="text-center">
-    <a class="btn btn-lg btn-primary" href="#" id="webhookButton">Create Web Hooks</a>
+    <a class="btn btn-lg btn-primary pull-right" href="#" id="webhookButton">Create Web Hooks</a>
+</div>
+<div class="row org-list">
+    {{#each orgs}}
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title setup-heading">{{@key}}</h3>
+                </div>
+                <div class="panel-body">
+                    <ul class="setup-list">
+                        {{#each this}}
+                            <li>
+                                <label><input type="checkbox" value="{{this}}" /> {{this}}</label>
+                            </li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    {{/each}}
 </div>

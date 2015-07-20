@@ -1,3 +1,19 @@
+.container {
+	margin-top: 60px;
+}
+
+.top-buttons {
+	position: fixed;
+	top: 60px;
+	left: 0;
+	width: 100%;
+	z-index: 100;
+}
+
+.org-list {
+	margin-top: 60px;
+}
+
 .setup-list {
 	list-style: none;
 }
