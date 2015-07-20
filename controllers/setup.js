@@ -4,7 +4,7 @@ var express = require('express');
 var router = express.Router();
 var isAuthenticated = require('../middleware').isAuthenticated;
 
-var webhook_url = '';
+var webhook_url = process.env.WEBHOOK_URL;
 
 router.get("/setup", isAuthenticated, function(req, res){
     var github = GitHubApi.client(req.user.token);
