@@ -1,5 +1,8 @@
 var express = require('express');
 var router = express.Router();
+var GitHubApi = require('octonode');
+
+var github = GitHubApi.client(process.env.GH_ACCESS_TOKEN);
 
 var buildChecklist = function(){
     var checklist = [
