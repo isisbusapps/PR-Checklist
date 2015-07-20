@@ -21,6 +21,8 @@ var buildChecklist = function(){
 
 router.post('/pullrequest/', function(req, res){
     var payload = req.body.payload;
+    console.log(payload);
+    console.log(payload.action);
     var pr;
     if(payload.action === "opened"){
         console.log("New pull request for " + payload.repository.full_name);
