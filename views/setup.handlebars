@@ -1,12 +1,14 @@
 {{#each orgs}}
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">{{name}}</h3>
+            <h3 class="panel-title setup-heading">{{name}}</h3>
         </div>
         <div class="panel-body">
-            <ul>
+            <ul class="setup-list">
                 {{#each repos}}
-                    <li>{{this}}</li>
+                    <li>
+                        <label><input type="checkbox" value="{{this}}" /> {{this}}</label>
+                    </li>
                 {{/each}}
             </ul>
         </div>

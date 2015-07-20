@@ -4,6 +4,8 @@ var express = require('express');
 var router = express.Router();
 var isAuthenticated = require('../middleware').isAuthenticated;
 
+var webhook_url = '';
+
 router.get("/setup", isAuthenticated, function(req, res){
     var github = GitHubApi.client(req.user.token);
     var me = github.me();
@@ -45,6 +47,40 @@ router.get("/setup", isAuthenticated, function(req, res){
             });
         });
     })
+});
+
+router.post("/webhook", isAuthenticated, function(req, res){
+	var repos = req.body.repos;
+	var github = GitHubApi.client(req.user.token);
+	var i = 0;
+	repos.forEach(function(repoName){
+		var repo = github.repo(repoName);
+		repo.hooks(function(err, hooks){
+			var hookExists = false;
+			hooks.forEach(function(hook){
+				if(hook.config.url === webhook_url){
+					hookExists = true;
+				}
+			});
+
+			if(!hookExists){
+				repo.hook({
+					name: "PR-Checklist",
+					active: true,
+					events: ["pull_request"],
+					config: {
+						url: webhook_url
+					}
+				}, function(err){
+					if(err) console.log(err);
+
+					if(++i === repos.length){
+						return res.sendStatus(200);
+					}
+				});
+			}
+		});
+	});
 });
 
 module.exports = router;
