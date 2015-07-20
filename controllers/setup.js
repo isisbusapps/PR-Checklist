@@ -49,30 +49,38 @@ router.get("/setup", isAuthenticated, function(req, res){
     })
 });
 
-router.post("/webhook", isAuthenticated, function(req, res){
+router.post("/setup/webhooks", isAuthenticated, function(req, res){
 	var repos = req.body.repos;
 	var github = GitHubApi.client(req.user.token);
 	var i = 0;
 	repos.forEach(function(repoName){
 		var repo = github.repo(repoName);
 		repo.hooks(function(err, hooks){
+			if(err){
+				console.log("Error getting hooks");
+				console.log(err);
+				return res.sendStatus(500);
+			}
 			var hookExists = false;
+
 			hooks.forEach(function(hook){
 				if(hook.config.url === webhook_url){
+					console.log('Hook already exists');
 					hookExists = true;
 				}
 			});
 
 			if(!hookExists){
+				console.log('About to create web hook');
 				repo.hook({
-					name: "PR-Checklist",
+					name: 'web',
 					active: true,
-					events: ["pull_request"],
+					events: ['pull_request'],
 					config: {
 						url: webhook_url
 					}
 				}, function(err){
-					if(err) console.log(err);
+					if(err) console.log(err.body.errors);
 
 					if(++i === repos.length){
 						return res.sendStatus(200);
