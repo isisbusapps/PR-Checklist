@@ -6,56 +6,52 @@ var isAuthenticated = require('../middleware').isAuthenticated;
 
 var webhook_url = process.env.WEBHOOK_URL;
 
+function doesWebHookExist(hooks){
+	var hookExists = false;
+
+	hooks.forEach(function(hook){
+		if(hook.config.url === webhook_url){
+			console.log('Hook already exists');
+			hookExists = true;
+		}
+	});
+
+	return hookExists;
+}
+
 router.get("/setup", isAuthenticated, function(req, res){
     var github = GitHubApi.client(req.user.token);
     var me = github.me();
-    var orgsArr = [];
-    var i = 0;
+    var orgs = {};
+    var i = 0, repoCount = 0;
+
+    function repoDone(){
+    	if(++i >= repoCount) {
+    		return res.render('setup', {orgs: orgs});
+    	}
+    }
 
     // Get all user's own repos
-    me.repos(function(err, repos){
-    	var repoArr = [];
+    me.repos({ per_page: 200 }, function(err, repos){
+    	repoCount = repos.length;
         repos.forEach(function(repo){
             if(repo.permissions.admin){
-	            repoArr.push(repo.full_name);
+            	var ghRepo = github.repo(repo.full_name);
+            	ghRepo.hooks(function(err, hooks){
+            		if(!doesWebHookExist(hooks)){
+			            if(!orgs[repo.owner.login]){
+			            	orgs[repo.owner.login] = [];
+			            }
+		            	orgs[repo.owner.login].push(repo.full_name);
+
+            		}
+        			repoDone();
+            	});
+	        }else{
+	        	repoDone();
 	        }
         });
-        orgsArr.push({
-            name: req.user.profile.username,
-            repos: repoArr
-        });
-        i++;
     });
-
-    // Fetch all orgs repos
-    me.orgs(function(err, orgs){
-        if(err){
-            console.log(err);
-            return res.sendStatus(err.statusCode);
-        }
-        orgs.forEach(function(org){
-            var ghOrg = github.org(org.login);
-            ghOrg.repos(function(err, repos){
-                var repoArr = [];
-                repos.forEach(function(repo){
-                	if(repo.permissions.admin){
-	                    repoArr.push(repo.full_name);
-	                }
-                });
-                if(repoArr.length){
-                	orgsArr.push({
-	                    name: org.login,
-	                    repos: repoArr
-	                });
-                }
-
-                // Completed
-                if(++i === (orgs.length+1)){
-                	res.render('setup', {orgs: orgsArr});
-                }
-            });
-        });
-    })
 });
 
 router.post("/setup/webhooks", isAuthenticated, function(req, res){
@@ -70,14 +66,7 @@ router.post("/setup/webhooks", isAuthenticated, function(req, res){
 				console.log(err);
 				return res.sendStatus(500);
 			}
-			var hookExists = false;
-
-			hooks.forEach(function(hook){
-				if(hook.config.url === webhook_url){
-					console.log('Hook already exists');
-					hookExists = true;
-				}
-			});
+			var hookExists = doesWebHookExist(hooks);
 
 			if(!hookExists){
 				console.log('About to create web hook');
