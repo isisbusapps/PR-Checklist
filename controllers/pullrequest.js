@@ -8,7 +8,8 @@ var buildChecklist = function(){
     var checklist = [
         "All tests are passing",
         "Any changes to webservices has been communicated to those who consume it",
-        "Any relevant 'whats new' have been updated"
+        "Any relevant 'whats new' have been updated",
+        "Performed code review"
     ];
     var comment = "Please make sure the following are completed before merging:\n";
 
